@@ -67,8 +67,20 @@ This project runs MCP servers on Unraid, providing shared AI context services to
    docker-compose up -d
    ```
 
-3. **Configure Claude Code:**
-   Edit `~/.claude/settings.local.json` with MCP endpoints
+3. **Configure Claude Code on each client machine:**
+   See [CLAUDE_CONFIG.md](CLAUDE_CONFIG.md) for detailed client setup instructions.
+
+   Quick setup:
+   ```bash
+   # Copy bridge script to each machine
+   mkdir -p ~/.local/bin
+   cp mcp-bridge.py ~/.local/bin/
+   chmod +x ~/.local/bin/mcp-bridge.py
+
+   # Add MCP server using Claude CLI
+   claude mcp add -e PYTHONUNBUFFERED=1 --scope user brave-search -- \
+     python3 ~/.local/bin/mcp-bridge.py http://${UNRAID_IP}:8011/mcp
+   ```
 
 ---
 
@@ -135,13 +147,17 @@ docker-compose up -d
 
 ---
 
+## Usage
+
+Once configured, Claude Code on any of your 4 machines can use Brave Search through the centralized Unraid server.
+
 ## TODO
 
-- [ ] Add Obsidian MCP configuration
 - [ ] Implement Docker secrets for API keys
+- [ ] Add Sequential Thinking MCP server
+- [ ] Add Fetch Content MCP server
 - [ ] Add healthcheck endpoints
 - [ ] Set up monitoring in Grafana/Prometheus
-- [ ] Configure auto-restart policies
 
 ---
 
