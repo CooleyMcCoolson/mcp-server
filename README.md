@@ -58,12 +58,12 @@ This project runs MCP servers on Unraid, providing shared AI context services to
 1. **Create directories on Unraid:**
    ```bash
    ssh root@${UNRAID_IP}
-   mkdir -p /mnt/cache_nvme/appdata/mcp/{brave-search,sequential-thinking,fetch-content,obsidian}
+   mkdir -p /mnt/appdata/mcp/{brave-search,sequential-thinking,fetch-content,obsidian}
    ```
 
 2. **Deploy containers:**
    ```bash
-   cd /mnt/cache_nvme/appdata/mcp
+   cd /mnt/appdata/mcp
    docker-compose up -d
    ```
 
