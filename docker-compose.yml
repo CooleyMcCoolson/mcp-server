@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  # Brave Search MCP - Web search via Brave API
+  # Official image: mcp/brave-search
+  # Source: https://github.com/brave/brave-search-mcp-server
+  brave-search:
+    image: mcp/brave-search:latest
+    container_name: mcp-brave-search
+    restart: unless-stopped
+    ports:
+      - "8001:8080"
+    environment:
+      BRAVE_API_KEY: "${BRAVE_API_KEY}"
+      BRAVE_MCP_TRANSPORT: "http"
+      BRAVE_MCP_PORT: "8080"
+      BRAVE_MCP_HOST: "0.0.0.0"
+      BRAVE_MCP_LOG_LEVEL: "info"
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Obsidian MCP - Vault access and search
+  # DISABLED: Vaults are stored locally on each machine
+  # To enable: Move vault to Unraid or run MCP locally on each machine
+  # Source: https://github.com/MarkusPfundstein/mcp-obsidian
+  # obsidian:
+  #   image: node:22-alpine
+  #   container_name: mcp-obsidian
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8002:8080"
+  #   environment:
+  #     OBSIDIAN_VAULT_PATH: "/vault"
+  #     NODE_ENV: "production"
+  #   volumes:
+  #     # TODO: Update this path to your Obsidian vault location
+  #     - /path/to/obsidian/vault:/vault:ro
+  #   command: >
+  #     sh -c "npm install -g @modelcontextprotocol/server-obsidian &&
+  #            npx @modelcontextprotocol/server-obsidian /vault --transport http --port 8080 --host 0.0.0.0"
+  #   networks:
+  #     - mcp-network
+
+  # Fetch Content MCP - Web content retrieval
+  # Source: https://github.com/modelcontextprotocol/servers
+  fetch:
+    image: node:22-alpine
+    container_name: mcp-fetch
+    restart: unless-stopped
+    ports:
+      - "8003:8080"
+    environment:
+      NODE_ENV: "production"
+    command: >
+      sh -c "npm install -g @modelcontextprotocol/server-fetch &&
+             npx @modelcontextprotocol/server-fetch --transport http --port 8080 --host 0.0.0.0"
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Sequential Thinking MCP - Complex reasoning chains
+  # TODO: Find official package/image
+  # Placeholder for future implementation
+  # sequential-thinking:
+  #   image: node:22-alpine
+  #   container_name: mcp-sequential-thinking
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8004:8080"
+  #   environment:
+  #     NODE_ENV: "production"
+  #   command: >
+  #     sh -c "npm install -g @modelcontextprotocol/server-sequential-thinking &&
+  #            npx @modelcontextprotocol/server-sequential-thinking --transport http --port 8080 --host 0.0.0.0"
+  #   networks:
+  #     - mcp-network
+
+networks:
+  mcp-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
